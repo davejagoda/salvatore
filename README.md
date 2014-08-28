@@ -7,4 +7,5 @@ Log files
 ---------
 
 syslog ( /var/log/syslog )
+
 http logs ( /var/log/apache2/ )
