@@ -14,3 +14,7 @@ Resources
 ---------
 
 https://developers.google.com/drive/web/quickstart/quickstart-python
+
+https://developers.google.com/accounts/docs/OAuth2InstalledApp
+
+https://developers.google.com/accounts/docs/OAuth2ForDevices
