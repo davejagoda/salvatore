@@ -3,11 +3,7 @@
 import pprint
 import httplib2
 import apiclient.discovery
-import apiclient.http
 import oauth2client.client
-
-OAUTH2_SCOPE = 'https://www.googleapis.com/auth/drive'
-CLIENT_SECRETS = 'client_secrets.json'
 
 f = open('bearer_token.json', 'r')
 credentials = oauth2client.client.Credentials.new_from_json(f.read())
@@ -31,5 +27,6 @@ while True:
     if not page_token:
         break
 
-print(result)
 print(len(result))
+for item in result:
+    pprint.pprint(item)
