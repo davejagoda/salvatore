@@ -27,6 +27,6 @@ while True:
     if not page_token:
         break
 
-print(len(result))
+print('total {}'.format(len(result)))
 for item in result:
     pprint.pprint(item)
