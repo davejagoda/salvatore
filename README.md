@@ -3,6 +3,13 @@ Salvatore
 
 Salvatore saves things (e.g. log files)
 
+
+Storage as a Service
+--------------------
+
+Google Drive
+Amazon S3
+
 Log files
 ---------
 
