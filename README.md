@@ -6,13 +6,19 @@ Salvatore saves things (e.g. log files)
 Installation
 ------------
 
-cd ~/src/github
-git clone git@github.com:a16z/salvatore.git
-cd salvatore
-virtualenv venv
-source venv/bin/activate
-pip install google-api-python-client
-pip install boto3
+`cd ~/src/github`
+
+`git clone git@github.com:a16z/salvatore.git`
+
+`cd salvatore`
+
+`virtualenv venv`
+
+`source venv/bin/activate`
+
+`pip install google-api-python-client`
+
+`pip install boto3`
 
 
 Storage as a Service
