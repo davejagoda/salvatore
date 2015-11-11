@@ -1,44 +1,45 @@
 #!/usr/bin/env python
 
-import sys
+import argparse
 import httplib2
 import apiclient.discovery
 import oauth2client.client
 
-if 3 != len(sys.argv):
-    print('need two arguments - the file to upload and the destination folder')
-    sys.exit(1)
-filename = sys.argv[1]
-folder = sys.argv[2]
+def uploadDrive(drive_service, filename, folder):
+    # find directory
+    q = 'title="{}"'.format(folder)
+    files = drive_service.files().list(q=q).execute()
+    if 1 != len(files['items']):
+        print('did not find exactly one folder')
+        return(None)
+    id = files['items'][0]['id']
+    # upload
+    media_body = apiclient.http.MediaFileUpload(
+        filename,
+        mimetype = 'text/plain'
+    )
+    body = {
+        'title': filename,
+        'description': filename,
+        'parents': [{'id': id}]
+    }
+    # Perform the request and print the result.
+    new_file = drive_service.files().insert(body=body, media_body=media_body).execute()
+    return(new_file['id'])
 
-f = open('bearer_token.json', 'r')
-credentials = oauth2client.client.Credentials.new_from_json(f.read())
-f.close()
-
-http = httplib2.Http()
-credentials.authorize(http)
-drive_service = apiclient.discovery.build('drive', 'v2', http=http)
-
-# find directory
-q="title='" + folder + "'"
-files = drive_service.files().list(q=q).execute()
-if 1 != len(files['items']):
-    print('did not find exactly one folder')
-    sys.exit(1)
-id = files['items'][0]['id']
-
-# upload
-media_body = apiclient.http.MediaFileUpload(
-    filename,
-    mimetype = 'text/plain'
-)
-
-body = {
-  'title': filename,
-  'description': filename,
-  'parents': [{'id': id}]
-}
-
-# Perform the request and print the result.
-new_file = drive_service.files().insert(body=body, media_body=media_body).execute()
-print(new_file['id'])
+if '__main__' == __name__:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true', help='show verbose output')
+    parser.add_argument('-t', '--tokenFile', action='store', required=True, help='file containing OAuth token in JSON format')
+    parser.add_argument('filename', help='the path to the file to be uploaded')
+    parser.add_argument('folder', help='the Google Drive folder in which to upload')
+    args = parser.parse_args()
+    with open(args.tokenFile, 'r') as f:
+        credentials = oauth2client.client.Credentials.new_from_json(f.read())
+    if args.verbose:
+        print(type(credentials))
+        print(credentials)
+    http = httplib2.Http()
+    credentials.authorize(http)
+    drive_service = apiclient.discovery.build('drive', 'v2', http=http)
+    print(uploadDrive(drive_service, args.filename, args.folder))
