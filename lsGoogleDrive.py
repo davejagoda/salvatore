@@ -32,19 +32,16 @@ def print_raw_result(result):
     for item in result:
         pprint.pprint(item)
 
-def print_row(result, md5):
-    row = []
+def print_result(result, md5):
     for item in result:
         if md5:
             if 'md5Checksum' in item:
                 sum = item['md5Checksum']
             else:
                 sum = '0'*32
-            row.append((sum, item['title']))
+            print(u'{} {}'.format(sum, item['title']))
         else:
-            row.append((item['title']))
-    for field in row:
-        print(u' '.join(field))
+            print(format(item['title']))
 
 if '__main__' == __name__:
     parser = argparse.ArgumentParser()
@@ -58,4 +55,4 @@ if '__main__' == __name__:
     if args.raw:
         print_raw_result(result)
     else:
-        print_row(result, args.md5)
+        print_result(result, args.md5)
