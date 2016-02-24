@@ -32,17 +32,24 @@ def print_raw_result(result):
     for item in result:
         pprint.pprint(item)
 
-def print_names(result):
-    names = []
+def print_row(result, md5):
+    row = []
     for item in result:
-        names.append(item['title'])
-    names.sort()
-    for name in names:
-        print(name.encode('utf8'))
+        if md5:
+            if 'md5Checksum' in item:
+                sum = item['md5Checksum']
+            else:
+                sum = '0'*32
+            row.append((sum, item['title']))
+        else:
+            row.append((item['title']))
+    for field in row:
+        print(u' '.join(field))
 
 if '__main__' == __name__:
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--tokenFile', action='store', required=True, help='file containing OAuth token in JSON format')
+    parser.add_argument('-m', '--md5', action='store_true', help='show md5sums')
     parser.add_argument('-r', '--raw', action='store_true', help='show raw output')
     parser.add_argument('-v', '--verbose', action='count', help='show verbose output')
     args = parser.parse_args()
@@ -51,4 +58,4 @@ if '__main__' == __name__:
     if args.raw:
         print_raw_result(result)
     else:
-        print_names(result)
+        print_row(result, args.md5)
