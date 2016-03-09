@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import time
 import httplib2
 import apiclient.discovery
 import oauth2client.client
@@ -23,14 +24,19 @@ def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False):
             'parents': [{'id': id}]
         }
         # Perform the request and print the result.
-        try:
-            new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
-        except Exception as e:
-            print('caught {} exception while uploading:{}, retrying'.format(e, filename))
-            new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
-        if verbose:
-            print(new_file['id'])
-        number_of_files_uploaded += 1
+        tries = 0
+        done = False
+        while not done and tries < 3:
+            try:
+                new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
+                done = True
+                number_of_files_uploaded += 1
+                if verbose:
+                    print('successfully uploaded file with id:{} and name:{}'.format(new_file['id'], filename))
+            except Exception as e:
+                tries += 1
+                print('on try:{} caught:{} exception while uploading:{}, retrying in {} seconds.'.format(tries, e, filename, 2 ** tries))
+                time.sleep(2 ** tries)
     return(number_of_files_uploaded)
 
 if '__main__' == __name__:
