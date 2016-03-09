@@ -5,7 +5,8 @@ import httplib2
 import apiclient.discovery
 import oauth2client.client
 
-def uploadDrive(drive_service, filename, folder, ocr=False):
+def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False):
+    number_of_files_uploaded = 0
     # find directory
     q = 'title="{}"'.format(folder)
     files = drive_service.files().list(q=q).execute()
@@ -14,24 +15,36 @@ def uploadDrive(drive_service, filename, folder, ocr=False):
         return(None)
     id = files['items'][0]['id']
     # upload
-    media_body = apiclient.http.MediaFileUpload(filename)
-    body = {
-        'title': filename,
-        'description': filename,
-        'parents': [{'id': id}]
-    }
-    # Perform the request and print the result.
-    new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
-    return(new_file['id'])
+    for filename in filenames:
+        media_body = apiclient.http.MediaFileUpload(filename)
+        body = {
+            'title': filename,
+            'description': filename,
+            'parents': [{'id': id}]
+        }
+        # Perform the request and print the result.
+        try:
+            new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
+        except Exception as e:
+            print('caught {} exception while uploading:{}, retrying'.format(e, filename))
+            new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
+        if verbose:
+            print(new_file['id'])
+        number_of_files_uploaded += 1
+    return(number_of_files_uploaded)
 
 if '__main__' == __name__:
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true', help='show verbose output')
     parser.add_argument('-t', '--tokenFile', action='store', required=True, help='file containing OAuth token in JSON format')
     parser.add_argument('-o', '--ocr', action='store_true', help='perform OCR on the uploaded file')
-    parser.add_argument('filename', help='the path to the file to be uploaded')
-    parser.add_argument('folder', help='the Google Drive folder in which to upload')
+    parser.add_argument('filename', nargs='+', help='the path to the file[s] to be uploaded')
+    parser.add_argument('folder', nargs=1, help='the Google Drive folder in which to upload')
     args = parser.parse_args()
+    if args.verbose:
+        print('filename[s]:{}'.format(args.filename))
+        print('folder:{}'.format(args.folder))
+        print('number of files:{}'.format(len(args.filename)))
     with open(args.tokenFile, 'r') as f:
         credentials = oauth2client.client.Credentials.new_from_json(f.read())
     if args.verbose:
@@ -40,4 +53,5 @@ if '__main__' == __name__:
     http = httplib2.Http()
     credentials.authorize(http)
     drive_service = apiclient.discovery.build('drive', 'v2', http=http)
-    print(uploadDrive(drive_service, args.filename, args.folder, args.ocr))
+    assert 1 == len(args.folder)
+    print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, args.folder[0], args.verbose, args.ocr)))
