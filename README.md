@@ -16,10 +16,7 @@ Installation
 
 `source venv/bin/activate`
 
-`pip install google-api-python-client`
-
-`pip install boto3`
-
+`pip install -r requirements.txt`
 
 Storage as a Service
 --------------------
