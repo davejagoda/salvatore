@@ -61,5 +61,4 @@ if '__main__' == __name__:
     credentials.authorize(http)
     drive_service = apiclient.discovery.build('drive', 'v2', http=http)
     assert 1 == len(args.folder)
-    print(args.ocrLanguage)
     print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, args.folder[0], args.verbose, args.ocr, args.ocrLanguage)))
