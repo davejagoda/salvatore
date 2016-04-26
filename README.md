@@ -8,7 +8,7 @@ Installation
 
 `cd ~/src/github`
 
-`git clone git@github.com:a16z/salvatore.git`
+`git clone git@github.com:davejagoda/salvatore.git`
 
 `cd salvatore`
 
