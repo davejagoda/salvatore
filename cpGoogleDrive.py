@@ -6,7 +6,7 @@ import httplib2
 import apiclient.discovery
 import oauth2client.client
 
-def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False):
+def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False, ocrLanguage=None):
     number_of_files_uploaded = 0
     # find directory
     q = 'title="{}"'.format(folder)
@@ -28,7 +28,7 @@ def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False):
         done = False
         while not done and tries < 3:
             try:
-                new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr).execute()
+                new_file = drive_service.files().insert(body=body, media_body=media_body, ocr=ocr, ocrLanguage=ocrLanguage).execute()
                 done = True
                 number_of_files_uploaded += 1
                 if verbose:
@@ -44,6 +44,7 @@ if '__main__' == __name__:
     parser.add_argument('-v', '--verbose', action='store_true', help='show verbose output')
     parser.add_argument('-t', '--tokenFile', action='store', required=True, help='file containing OAuth token in JSON format')
     parser.add_argument('-o', '--ocr', action='store_true', help='perform OCR on the uploaded file')
+    parser.add_argument('-l', '--ocrLanguage', action='store', help='ocr language hint (e.g. "en")')
     parser.add_argument('filename', nargs='+', help='the path to the file[s] to be uploaded')
     parser.add_argument('folder', nargs=1, help='the Google Drive folder in which to upload')
     args = parser.parse_args()
@@ -60,4 +61,5 @@ if '__main__' == __name__:
     credentials.authorize(http)
     drive_service = apiclient.discovery.build('drive', 'v2', http=http)
     assert 1 == len(args.folder)
-    print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, args.folder[0], args.verbose, args.ocr)))
+    print(args.ocrLanguage)
+    print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, args.folder[0], args.verbose, args.ocr, args.ocrLanguage)))
