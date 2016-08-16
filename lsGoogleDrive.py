@@ -13,13 +13,15 @@ def get_drive_service(tokenFile, verbose=0):
     credentials.authorize(http)
     return(apiclient.discovery.build('drive', 'v2', http=http))
 
-def list_drive(drive_service, verbose=0):
+def list_drive(drive_service, name=None, verbose=0):
     result = []
     page_token = None
     while True:
         param = {}
         if page_token:
             param['pageToken'] = page_token
+        if name:
+            param['q'] = "title = '{}'".format(name)
         files = drive_service.files().list(**param).execute()
         result.extend(files['items'])
         page_token = files.get('nextPageToken')
@@ -39,19 +41,21 @@ def print_result(result, md5):
                 sum = item['md5Checksum']
             else:
                 sum = '0'*32
-            print(u'{} {}'.format(sum, item['title']))
+            print(u'{} {}'.format(sum, item['title']).encode('utf8'))
         else:
-            print(format(item['title']))
+            print(u'{}'.format(item['title']).encode('utf8'))
 
 if '__main__' == __name__:
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--tokenFile', action='store', required=True, help='file containing OAuth token in JSON format')
-    parser.add_argument('-m', '--md5', action='store_true', help='show md5sums')
-    parser.add_argument('-r', '--raw', action='store_true', help='show raw output')
     parser.add_argument('-v', '--verbose', action='count', help='show verbose output')
+    parser.add_argument('name', nargs='?', action='store', help='name to list')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-m', '--md5', action='store_true', help='show md5sums')
+    group.add_argument('-r', '--raw', action='store_true', help='show raw output')
     args = parser.parse_args()
     drive_service = get_drive_service(args.tokenFile, args.verbose)
-    result = list_drive(drive_service, args.verbose)
+    result = list_drive(drive_service, args.name, args.verbose)
     if args.raw:
         print_raw_result(result)
     else:
