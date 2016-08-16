@@ -2,7 +2,7 @@
 
 import argparse
 import time
-import apiclient.discovery
+import apiclient
 from utils import get_drive_service
 
 def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False, ocrLanguage=None):
