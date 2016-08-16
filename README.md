@@ -49,3 +49,10 @@ http://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html
 http://docs.aws.amazon.com/cli/latest/reference/s3api/index.html
 
 https://github.com/boto/boto3
+
+Sample Invocations
+------------------
+
+Upload a test CSV file:
+
+`./cpGoogleDriveCSV.py -t oauth_token.json test.csv`
