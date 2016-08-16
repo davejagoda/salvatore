@@ -34,7 +34,7 @@ def print_raw_result(result):
     for item in result:
         pprint.pprint(item)
 
-def print_result(result, md5):
+def print_result(result, md5, parents):
     for item in result:
         if md5:
             if 'md5Checksum' in item:
@@ -42,7 +42,9 @@ def print_result(result, md5):
             else:
                 sum = '0'*32
             print(u'{} {}'.format(sum, item['title']).encode('utf8'))
-        else:
+        if parents:
+            print(u'{} {}'.format(len(item['parents']), item['title']).encode('utf8'))
+        if not md5 and not parents:
             print(u'{}'.format(item['title']).encode('utf8'))
 
 if '__main__' == __name__:
@@ -52,6 +54,7 @@ if '__main__' == __name__:
     parser.add_argument('name', nargs='?', action='store', help='name to list')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-m', '--md5', action='store_true', help='show md5sums')
+    group.add_argument('-p', '--parents', action='store_true', help='show parent counts')
     group.add_argument('-r', '--raw', action='store_true', help='show raw output')
     args = parser.parse_args()
     drive_service = get_drive_service(args.tokenFile, args.verbose)
@@ -59,4 +62,4 @@ if '__main__' == __name__:
     if args.raw:
         print_raw_result(result)
     else:
-        print_result(result, args.md5)
+        print_result(result, args.md5, args.parents)
