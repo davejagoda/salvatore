@@ -1,7 +1,5 @@
 # Python
 *.py[cod]
 
-# Emacs
-*~
-
-venv/
+# virtualenv
+/venv/
