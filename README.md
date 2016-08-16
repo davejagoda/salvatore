@@ -22,14 +22,15 @@ Storage as a Service
 --------------------
 
 Google Drive
+
 Amazon S3
 
 Log files
 ---------
 
-syslog ( /var/log/syslog )
+syslog ( `/var/log/syslog` )
 
-http logs ( /var/log/apache2/ )
+http logs ( `/var/log/apache2/` )
 
 Resources
 ---------
