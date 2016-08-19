@@ -2,17 +2,18 @@
 
 import argparse
 import apiclient
-from utils import get_drive_service
+import utils
 
 mime_dict = {
     'csv': ['application/vnd.google-apps.spreadsheet', 'text/csv'],
     'doc': ['application/vnd.google-apps.document', 'text/plain']
 }
 
-def uploadDrive(drive_service, filename, dict_key):
+def uploadDrive(drive_service, filename, folder_id, dict_key):
     body = {
         'title': filename,
-        'mimeType': mime_dict[dict_key][0]
+        'mimeType': mime_dict[dict_key][0],
+        'parents': [{'id': folder_id}]
     }
     media_body = apiclient.http.MediaFileUpload(filename,
                                  mimetype=mime_dict[dict_key][1],
@@ -28,10 +29,13 @@ if '__main__' == __name__:
     group.add_argument('-c', '--csv', action='store_true', help='convert to google spreadsheet')
     group.add_argument('-d', '--doc', action='store_true', help='convert to google doc')
     parser.add_argument('filename', help='the path to the file to be uploaded')
+    parser.add_argument('folder', help='the Google Drive folder in which to upload')
     args = parser.parse_args()
-    drive_service = get_drive_service(args.tokenFile, args.verbose)
+    drive_service = utils.get_drive_service(args.tokenFile, args.verbose)
     if args.csv:
         dict_key = 'csv'
     if args.doc:
         dict_key = 'doc'
-    print(uploadDrive(drive_service, args.filename, dict_key))
+    folder_id = utils.get_folder_id(drive_service, args.folder, args.verbose)
+    print(folder_id)
+    print(uploadDrive(drive_service, args.filename, folder_id, dict_key))

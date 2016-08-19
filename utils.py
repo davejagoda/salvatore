@@ -10,3 +10,11 @@ def get_drive_service(tokenFile, verbose=0):
     http = httplib2.Http()
     credentials.authorize(http)
     return(apiclient.discovery.build('drive', 'v2', http=http))
+
+def get_folder_id(drive_service, folder, verbose=0):
+    q = 'title="{}" and mimeType="application/vnd.google-apps.folder"'.format(folder)
+    files = drive_service.files().list(q=q).execute()
+    if 1 != len(files['items']):
+        print('did not find exactly one folder')
+        return(None)
+    return(files['items'][0]['id'])

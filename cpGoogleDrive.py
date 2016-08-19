@@ -3,24 +3,16 @@
 import argparse
 import time
 import apiclient
-from utils import get_drive_service
+import utils
 
-def uploadDrive(drive_service, filenames, folder, verbose=False, ocr=False, ocrLanguage=None):
+def uploadDrive(drive_service, filenames, folder_id, verbose=False, ocr=False, ocrLanguage=None):
     number_of_files_uploaded = 0
-    # find directory
-    q = 'title="{}"'.format(folder)
-    files = drive_service.files().list(q=q).execute()
-    if 1 != len(files['items']):
-        print('did not find exactly one folder')
-        return(None)
-    id = files['items'][0]['id']
-    # upload
     for filename in filenames:
         media_body = apiclient.http.MediaFileUpload(filename)
         body = {
             'title': filename,
             'description': filename,
-            'parents': [{'id': id}]
+            'parents': [{'id': folder_id}]
         }
         # Perform the request and print the result.
         tries = 0
@@ -51,6 +43,7 @@ if '__main__' == __name__:
         print('filename[s]:{}'.format(args.filename))
         print('folder:{}'.format(args.folder))
         print('number of files:{}'.format(len(args.filename)))
-    drive_service = get_drive_service(args.tokenFile, args.verbose)
+    drive_service = utils.get_drive_service(args.tokenFile, args.verbose)
     assert 1 == len(args.folder)
-    print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, args.folder[0], args.verbose, args.ocr, args.ocrLanguage)))
+    folder_id = utils.get_folder_id(drive_service, args.folder[0], args.verbose)
+    print('{} files successfully uploaded'.format(uploadDrive(drive_service, args.filename, folder_id, args.verbose, args.ocr, args.ocrLanguage)))
