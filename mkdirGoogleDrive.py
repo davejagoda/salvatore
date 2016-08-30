@@ -2,7 +2,7 @@
 
 import argparse
 import apiclient
-from utils import get_drive_service
+import utils
 
 def mkdir(drive_service, dirname):
     body = {
@@ -17,5 +17,5 @@ if '__main__' == __name__:
     parser.add_argument('-v', '--verbose', action='count', help='show verbose output')
     parser.add_argument('dirname', help='the directory to be created')
     args = parser.parse_args()
-    drive_service = get_drive_service(args.tokenFile, args.verbose)
+    drive_service = utils.get_drive_service(args.tokenFile, args.verbose)
     print(mkdir(drive_service, args.dirname))

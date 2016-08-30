@@ -25,3 +25,7 @@ def get_document_contents_from_drive(drive_service, file_id, verbose=0):
     if verbose > 0:
         print('BOM found')
     return(data[1:])
+
+def get_document_title_and_type_from_id(drive_service, id, verbose=0):
+    data = drive_service.files().get(fileId=id).execute()
+    return(data['title'], data['mimeType'])
