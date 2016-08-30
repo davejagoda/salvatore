@@ -18,3 +18,10 @@ def get_folder_id(drive_service, folder, verbose=0):
         print('did not find exactly one folder')
         return(None)
     return(files['items'][0]['id'])
+
+def get_document_contents_from_drive(drive_service, file_id, verbose=0):
+    data = drive_service.files().export(fileId=file_id, mimeType='text/plain').execute().decode('utf8')
+    assert(unichr(0xfeff) == data[0])
+    if verbose > 0:
+        print('BOM found')
+    return(data[1:])

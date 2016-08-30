@@ -20,21 +20,14 @@ def uploadDrive(drive_service, filename, folder_id):
     )
     return(drive_service.files().insert(body=body, media_body=media_body).execute()['id'])
 
-def downloadDrive(drive_service, file_id, verbose=0):
-    data = drive_service.files().export(fileId=file_id, mimeType='text/plain').execute().decode('utf8')
-    assert(unichr(0xfeff) == data[0])
-    if verbose > 0:
-        print('BOM found')
-    return(data[1:])
-
-def diffOriginalVsDrive(original, drive):
+def diffOriginalVsDrive(original_document_contents, drive_document_contents):
     difflines_shown = False
-    for line in difflib.unified_diff(original, drive):
+    for line in difflib.unified_diff(original_document_contents, drive_document_contents):
         difflines_shown = True
         print(line)
     if not difflines_shown:
         print('files are same, showing remote file:')
-        for line in drive:
+        for line in drive_document_contents:
             print(line)
 
 if '__main__' == __name__:
@@ -54,9 +47,9 @@ if '__main__' == __name__:
     if args.interactive:
         raw_input('press enter to continue ')
     with codecs.open(args.filename, 'r', encoding='utf8') as f:
-        original = f.read()
-    drive = downloadDrive(drive_service, file_id, args.verbose)
-    diffOriginalVsDrive(original.splitlines(), drive.splitlines())
+        original_document_contents = f.read()
+    drive_document_contents = utils.get_document_contents_from_drive(drive_service, file_id, args.verbose)
+    diffOriginalVsDrive(original_document_contents.splitlines(), drive_document_contents.splitlines())
     if args.delete:
         response = raw_input('enter "y" delete original file ')
         if 'y' == response:
