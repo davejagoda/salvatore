@@ -17,7 +17,7 @@ auth = JWTAuth(
 
 def folder_from_name(folder_name, af_id, verbose):
     folder_id = None
-    for item in find_items(folder_name, af_id, verbose):
+    for item in find_items(folder_name, af_id, True, verbose):
         if None == folder_id or int(folder_id) < int(item['id']):
             folder_id = item['id']
     if None == folder_id:
@@ -40,7 +40,7 @@ def list_folder(folder_id, indent, recursive=False):
         if recursive and 'folder' == item.type:
             list_folder(item.id, indent+1, recursive)
 
-def find_items(query, af_id, verbose):
+def find_items(query, af_id, exact, verbose):
     items = []
     ancestor_folder = client.folder(folder_id=af_id)
     for item in client.search(query='"{}"'.format(query), limit=100, offset=0,
@@ -48,13 +48,14 @@ def find_items(query, af_id, verbose):
                               content_types='name'):
         if verbose > 0:
             print_item(item, indent=0)
-        items.append({'type': item.type, 'id': item.id})
+        if item.name == query or not exact:
+            items.append({'type': item.type, 'id': item.id})
     return(items)
 
 def delete_item(item_name, af_id, verbose):
-    items = find_items(item_name, af_id, verbose)
+    items = find_items(item_name, af_id, True, verbose)
     if 1 != len(items):
-        print('did not find exacly one item, no delete will occur')
+        print('did not find exactly one item, no delete will occur')
     else:
         item_id = items[0]['id']
         print('deleting:{}'.format(item_id))
@@ -76,9 +77,9 @@ def upload_file(file_name, folder_id, verbose):
 def get_file(file_name, folder_id, verbose):
     if verbose > 0:
         print('getting file:{} from folder_id:{}'.format(file_name, folder_id))
-    items = find_items(file_name, folder_id, verbose)
+    items = find_items(file_name, folder_id, True, verbose)
     if 1 != len(items):
-        print('did not find exacly one item, not getting file')
+        print('did not find exactly one item, not getting file')
     else:
         file_id = items[0]['id']
 # don't overwrite a local file
@@ -130,4 +131,4 @@ if '__main__' == __name__:
     if args.upload_file:
         upload_file(args.upload_file, af_id, args.verbose)
     if args.search:
-        find_items(args.search, af_id, args.verbose)
+        find_items(args.search, af_id, True, args.verbose)
