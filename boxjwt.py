@@ -45,11 +45,11 @@ def find_items(query, af_id, exact, verbose):
     ancestor_folder = client.folder(folder_id=af_id)
     for item in client.search(query='"{}"'.format(query), limit=100, offset=0,
                               ancestor_folders=[ancestor_folder],
-                              content_types='name'):
+                              content_types=['name']):
         if verbose > 0:
             print_item(item, indent=0)
         if item.name == query or not exact:
-            items.append({'type': item.type, 'id': item.id})
+            items.append(item)
     return(items)
 
 def delete_item(item_name, af_id, verbose):
@@ -131,4 +131,6 @@ if '__main__' == __name__:
     if args.upload_file:
         upload_file(args.upload_file, af_id, args.verbose)
     if args.search:
-        find_items(args.search, af_id, True, args.verbose)
+        print('search results for name:{}'.format(args.search))
+        for item in find_items(args.search, af_id, True, args.verbose):
+            print_item(item, 0)
