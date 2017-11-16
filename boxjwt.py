@@ -33,8 +33,7 @@ def print_item(item, indent):
     print('{}{} id:{} name:{}'.format('.'*indent, symbol, item.id, item.name))
 
 def list_folder(folder_id, indent, recursive=False):
-    for item in client.folder(folder_id=folder_id).get_items(limit=100,
-                                                             offset=0):
+    for item in client.folder(folder_id).get_items(limit=100, offset=0):
         assert(item.type in ['file', 'folder'])
         print_item(item, indent)
         if recursive and 'folder' == item.type:
@@ -42,7 +41,7 @@ def list_folder(folder_id, indent, recursive=False):
 
 def find_items(query, af_id, exact, verbose):
     items = []
-    ancestor_folder = client.folder(folder_id=af_id)
+    ancestor_folder = client.folder(af_id)
     for item in client.search(query='"{}"'.format(query), limit=100, offset=0,
                               ancestor_folders=[ancestor_folder],
                               content_types=['name']):
@@ -66,13 +65,14 @@ def delete_item(item_name, af_id, verbose):
 
 def make_folder(folder_name, folder_id, verbose):
     if verbose > 0:
-        print('creating folder:{} in folder_id:{}'.format(folder_name, folder_id))
-    client.folder(folder_id=folder_id).create_subfolder(folder_name)
+        print('creating folder:{} in folder_id:{}'.format(folder_name,
+                                                          folder_id))
+    return(client.folder(folder_id).create_subfolder(folder_name).object_id)
 
 def upload_file(file_name, folder_id, verbose):
     if verbose > 0:
         print('uploading file:{} to folder_id:{}'.format(file_name, folder_id))
-    client.folder(folder_id=folder_id).upload(file_name)
+    return(client.folder(folder_id).upload(file_name).object_id)
 
 def get_file(file_name, folder_id, verbose):
     if verbose > 0:
@@ -93,7 +93,7 @@ def get_file(file_name, folder_id, verbose):
                 raise
         else:
             with os.fdopen(fh, 'w') as file_obj:
-                client.file(file_id=file_id).download_to(file_obj)
+                client.file(file_id).download_to(file_obj)
 
 if '__main__' == __name__:
     parser = argparse.ArgumentParser()
@@ -127,9 +127,13 @@ if '__main__' == __name__:
     if args.list:
         list_folder(af_id, indent=0, recursive=True)
     if args.make_folder:
-        make_folder(args.make_folder, af_id, args.verbose)
+        print('Created folder has id:{}'.format(make_folder(args.make_folder,
+                                                            af_id,
+                                                            args.verbose)))
     if args.upload_file:
-        upload_file(args.upload_file, af_id, args.verbose)
+        print('Created file has id:{}'.format(upload_file(args.upload_file,
+                                                          af_id,
+                                                          args.verbose)))
     if args.search:
         print('search results for name:{}'.format(args.search))
         for item in find_items(args.search, af_id, True, args.verbose):
