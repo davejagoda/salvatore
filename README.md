@@ -6,17 +6,12 @@ Salvatore saves things (e.g. log files)
 Installation
 ------------
 
-`cd ~/src/github`
-
-`git clone git@github.com:davejagoda/salvatore.git`
-
-`cd salvatore`
-
-`virtualenv venv`
-
-`source venv/bin/activate`
-
-`pip install -r requirements.txt`
+```
+cd ~/src/github
+git clone git@github.com:davejagoda/salvatore.git
+cd salvatore
+pipenv install
+```
 
 Storage as a Service
 --------------------
@@ -67,8 +62,12 @@ Sample Invocations
 
 Upload a test CSV file and convert it to a Google spreadsheet:
 
-`./cpGoogleDriveCSV.py -t oauth_token.json testfile`
+```
+pipenv run ./cpGoogleDriveDoc.py -t oauth_token.json testfile testfolder -c
+```
 
 Upload a test text file and convert it to a Google document:
 
-`./cpGoogleDriveCSV.py -t oauth_token.json testfile`
+```
+pipenv run ./cpGoogleDriveDoc.py -t oauth_token.json testfile testfolder -d
+```
