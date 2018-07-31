@@ -27,7 +27,7 @@ def get_document_contents_from_drive(drive_service, file_id, verbose=0):
     data = drive_service.files().export(
         fileId=file_id, mimeType='text/plain'
     ).execute().decode('utf8')
-    assert(unichr(0xfeff) == data[0])
+    assert(chr(0xfeff) == data[0])
     if verbose > 0:
         print('BOM found')
     return data[1:]
