@@ -272,10 +272,12 @@
         },
         "pyjwt": {
             "hashes": [
-                "sha256:5c2ff2eb27d7e342dfc3cafcc16412781f06db2690fbef81922b0172598f085b",
-                "sha256:7a2b271c6dac2fda9e0c33d176c4253faba2c6c6b3a99c7f28a32c3c97522779"
+                "sha256:2f62390b667cd8257de560b850bb5a883102a388829274147f1d724453f8fb02",
+                "sha256:9bb459d1bdd0387967d287f5656bf7ec2b9a26645d1961628cda1764e087fd6e"
             ],
-            "version": "==2.0.0"
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==2.12.0"
         },
         "python-dateutil": {
             "hashes": [
